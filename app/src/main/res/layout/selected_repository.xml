@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/ivResidencePhotos"
+        android:layout_marginTop="12dp"
+        android:text="About Repository"
+        android:textSize="20dp"
+        android:textAppearance="@style/sectionHeader"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#c0c0c0"
+        android:id="@+id/line"
+        android:layout_below="@+id/tvTitle"/>
+
+    <TextView
+        android:id="@+id/tvName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/line"
+        android:layout_marginTop="12dp"
+        android:text="Repository Name"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/tvUrl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/tvName"
+        android:layout_toLeftOf="@+id/tvCity"
+        android:layout_toStartOf="@+id/tvCity"
+        android:text="Url"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/tvDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/tvUrl"
+        android:text="Short Description"
+        android:textSize="15dp"
+        android:layout_toRightOf="@+id/tvMapTitle"
+        android:layout_toEndOf="@+id/tvMapTitle" />
+
+    <TextView
+        android:id="@+id/tvForks"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/tvDescription"
+        android:text="Number of forks"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/tvOpenIssues"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/tvForks"
+        android:text="Open Issues"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/tvAboutOwner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="About the owner"
+        android:textSize="17dp"
+        android:textAppearance="@style/sectionHeader"
+        android:layout_below="@+id/tvOpenIssues"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="2dp"
+        android:background="#c0c0c0"
+        android:id="@+id/line1"
+        android:layout_below="@+id/tvAboutOwner"/>
+
+    <ImageView
+        android:id="@+id/ivProfilePic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/line1"
+        app:srcCompat="@drawable/ic_profile"/>
+
+    <TextView
+        android:id="@+id/tvOwnerName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/ivProfilePic"
+        android:text="Name"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/tvProfileUrl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/tvOwnerName"
+        android:text="Url of Owner's Profile"
+        android:textSize="15dp" />
+
+    <TextView
+        android:id="@+id/tvUserType"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/tvProfileUrl"
+        android:text="User Type"
+        android:textSize="15dp" />
+
+</LinearLayout>
