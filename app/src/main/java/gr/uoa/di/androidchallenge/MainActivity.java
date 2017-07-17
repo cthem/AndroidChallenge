@@ -44,8 +44,7 @@ public class MainActivity extends AppCompatActivity
     private RecyclerView recyclerView;
     private EditText search;
     private RealmResults<Repository> repositories;
-    private ArrayList<String> repositoryTitle;
-    private ArrayList<Boolean> repositoriesToShow;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -90,26 +89,21 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count)
                 {
+                    ArrayList<Repository> repositoriesToShow = new ArrayList<>();
                     String textWritten = s.toString();
                     //if user has never written something in search box, or has erased the message, then all buttons must be visible to user
-                    repositoryTitle = new ArrayList<>();
-                    repositoriesToShow = new ArrayList<>();
                     if(textWritten.isEmpty()) {
-                        for(int i=0; i<repositories.size();i++){
-                            repositoryTitle.add(repositories.get(i).getName());
+                        repositoriesToShow.addAll(repositories);
+                    }
+                    else {
+                        textWritten = textWritten.toLowerCase();
+                        for (Repository repo : repositories) {
+                            if(repo.getName().startsWith(textWritten))
+                                repositoriesToShow.add(repo);
                         }
                     }
-                    textWritten=textWritten.toLowerCase();
-                    for(int i=0;i<repositoryTitle.size(); i++)
-                    {
-                        if(repositoryTitle.get(i).toLowerCase().startsWith(textWritten))
-                        {
-                            repositoriesToShow.set(i, true);
-                        }
-                        else {
-                            repositoriesToShow.set(i, false);
-                        }
-                    }
+                    adapter.setSearchList(repositoriesToShow);
+                    adapter.notifyDataSetChanged();
                 }
 
                 @Override
@@ -161,6 +155,7 @@ public class MainActivity extends AppCompatActivity
 
         // Set the data and tell the RecyclerView to draw
         adapter.setRealmAdapter(realmAdapter);
+        adapter.setSearchList(repositories);
         adapter.notifyDataSetChanged();
     }
 

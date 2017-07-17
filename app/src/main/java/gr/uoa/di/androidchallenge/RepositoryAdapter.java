@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
@@ -38,12 +39,7 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
         this.searchList = searchList;
     }
 
-    public void setSearchIsActive(boolean searchIsActive) {
-        SearchIsActive = searchIsActive;
-    }
-
     private List<Repository> searchList;
-    boolean SearchIsActive;
 
 
     public RepositoryAdapter(Activity context, Realm realm)
@@ -64,10 +60,14 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
 
     // replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position) {
-
-        // get the repository
-        currentRepository = getItem(position);
+    public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position)
+    {
+        if (searchList.isEmpty())
+        {
+            Toast.makeText(context, "No repositories to show", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        currentRepository = this.searchList.get(position);
 
 
         // cast the generic view holder to our specific one
@@ -87,7 +87,7 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
                 .into(holder.avatar);
 
 
-        //show selected repository
+        //show more details about selected repository
         holder.card.setOnClickListener(new View.OnClickListener()
         {
             @Override
@@ -111,14 +111,14 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
                     final TextView tvUserType = (TextView)content.findViewById(R.id.tvUserType);
 
                     tvName.setText(String.format("Repository Name: %s",  repo.getName()));
-                    tvUrl.setText("URL: "+ repo.getUrl());
-                    tvDescription.setText("Short Description: "+ repo.getDescription());
-                    tvForks.setText("Number of forks: "+Integer.toString(repo.getForks()));
-                    tvOpenIssues.setText("Number of open issues: "+ Integer.toString(repo.getOpenIssues()));
+                    tvUrl.setText(String.format("URL: %s", repo.getUrl()));
+                    tvDescription.setText(String.format("Short Description: %s", repo.getDescription()));
+                    tvForks.setText(String.format("Forks: %s", Integer.toString(repo.getForks())));
+                    tvOpenIssues.setText(String.format("Open Issues: %s", Integer.toString(repo.getOpenIssues())));
 
-                    tvOwnerName.setText("Owner's name: "+ repo.getOwner().getLogin());
-                    tvProfileUrl.setText("Link to owner's profile: "+ repo.getOwner().getUrl());
-                    tvUserType.setText("User Type: "+ repo.getOwner().getType());
+                    tvOwnerName.setText(String.format("Username: %s", repo.getOwner().getLogin()));
+                    tvProfileUrl.setText(String.format("Profile URL: %s", repo.getOwner().getUrl()));
+                    tvUserType.setText(String.format("User Type: %s", repo.getOwner().getType()));
 
                     Glide.with(context)
                             .load(repo.getOwner().getAvatarUrl().replace("https", "http"))
@@ -142,10 +142,10 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
     // return the size of your data set (invoked by the layout manager)
     public int getItemCount() {
 
-        if (getRealmAdapter() != null) {
-            return getRealmAdapter().getCount();
-        }
-        return 0;
+//        if (getRealmAdapter() != null) {
+//            return getRealmAdapter().getCount();
+//        }
+        return searchList.size();
     }
 
     public static class CardViewHolder extends RecyclerView.ViewHolder
