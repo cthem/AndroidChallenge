@@ -28,6 +28,7 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
     final Activity context;
     private Realm realm;
     private LayoutInflater inflater;
+    private Repository selectedRepository;
 
 
     public RepositoryAdapter(Activity context, Realm realm)
@@ -49,29 +50,28 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position) {
 
-
         // get the repository
-        final Repository repository = getItem(position);
+        selectedRepository= getItem(position);
         // cast the generic view holder to our specific one
         final CardViewHolder holder = (CardViewHolder) viewHolder;
 
-        // set the title and the snippet
-        holder.textTitle.setText(repository.getName());
-        holder.textAuthor.setText(repository.getOwner().getLogin());
-        holder.textDescription.setText(repository.getDescription());
+        //set the title and the snippet
+        holder.textTitle.setText(selectedRepository.getName());
+        holder.textAuthor.setText(selectedRepository.getOwner().getLogin());
+        holder.textDescription.setText(selectedRepository.getDescription());
 
         // load the background image
       Glide.with(context)
-                .load(repository.getOwner().getAvatarUrl().replace("https", "http"))
+                .load(selectedRepository.getOwner().getAvatarUrl().replace("https", "http"))
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .centerCrop()
+                .fitCenter()
                 .error(R.id.ivProfilePic)
                 .into(holder.avatar);
 
 
         //show selected repository
-        holder.card.setOnClickListener(new View.OnClickListener() {
-
+        holder.card.setOnClickListener(new View.OnClickListener()
+        {
             @Override
             public void onClick(View v) {
 
@@ -89,18 +89,18 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
                 final TextView tvProfileUrl = (TextView)content.findViewById(R.id.tvProfileUrl);
                 final TextView tvUserType = (TextView)content.findViewById(R.id.tvUserType);
 
-                tvName.setText(repository.getName());
-                tvUrl.setText(repository.getUrl());
-                tvDescription.setText(repository.getDescription());
-                tvForks.setText(repository.getForks());
-                tvOpenIssues.setText(repository.getOpenIssues());
+                tvName.setText(selectedRepository.getName());
+                tvUrl.setText(selectedRepository.getUrl());
+                tvDescription.setText(selectedRepository.getDescription());
+                tvForks.setText(selectedRepository.getForks());
+                tvOpenIssues.setText(selectedRepository.getOpenIssues());
 
-                tvOwnerName.setText(repository.getOwner().getLogin());
-                tvProfileUrl.setText(repository.getOwner().getUrl());
-                tvUserType.setText(repository.getOwner().getType());
+                tvOwnerName.setText(selectedRepository.getOwner().getLogin());
+                tvProfileUrl.setText(selectedRepository.getOwner().getUrl());
+                tvUserType.setText(selectedRepository.getOwner().getType());
 
                 Glide.with(context)
-                        .load(repository.getOwner().getAvatarUrl().replace("https", "http"))
+                        .load(selectedRepository.getOwner().getAvatarUrl().replace("https", "http"))
                         .diskCacheStrategy(DiskCacheStrategy.ALL)
                         .centerCrop()
                         .error(R.id.ivProfilePic)

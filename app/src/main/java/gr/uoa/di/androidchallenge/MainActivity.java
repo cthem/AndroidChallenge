@@ -6,8 +6,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.KeyEvent;
+import android.widget.EditText;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,8 +26,6 @@ import DataModel.RestClient;
 import POJO.GithubRepositoriesResponse;
 import POJO.Repository;
 import io.reactivex.Observable;
-import io.reactivex.ObservableEmitter;
-import io.reactivex.ObservableOnSubscribe;
 import io.reactivex.Observer;
 import io.reactivex.annotations.NonNull;
 import io.reactivex.disposables.Disposable;
@@ -40,15 +41,11 @@ public class MainActivity extends AppCompatActivity
 {
     private RepositoryAdapter adapter;
     private Realm realm;
-    private LayoutInflater inflater;
     private RecyclerView recyclerView;
-
-    private ArrayList<Repository> repositories;
-    private Repository repository;
-
-    public ArrayList<Repository> getRepositories() {
-        return repositories;
-    }
+    private EditText search;
+    private RealmResults<Repository> repositories;
+    private ArrayList<String> repositoryTitle;
+    private ArrayList<Boolean> repositoriesToShow;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -58,86 +55,107 @@ public class MainActivity extends AppCompatActivity
         try {
             setContentView(R.layout.activity_main);
             recyclerView = (RecyclerView)findViewById(recycler);
-//
-//        //get realm instance
+
+           //get realm instance
             RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(this).build();
             Realm.setDefaultConfiguration(realmConfiguration);
             this.realm = RealmController.with(this).getRealm();
-//
-//        //set toolbar
+
+            //set toolbar
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             setSupportActionBar(toolbar);
+            getSupportActionBar().setDisplayShowTitleEnabled(false);
+            toolbar.setTitle("");
+            toolbar.setSubtitle("");
 
-
-
-
-
+            //get repositories
             getGithubRepositories();
 
             setupRecycler();
             setRealmAdapter();
+
             System.out.println();
 
+            //set up search field
+            search = (EditText)findViewById(R.id.search);
+            search.setSelected(false);
+            search.addTextChangedListener(new TextWatcher()
+            {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after)
+                {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count)
+                {
+                    String textWritten = s.toString();
+                    //if user has never written something in search box, or has erased the message, then all buttons must be visible to user
+                    repositoryTitle = new ArrayList<>();
+                    repositoriesToShow = new ArrayList<>();
+                    if(textWritten.isEmpty()) {
+                        for(int i=0; i<repositories.size();i++){
+                            repositoryTitle.add(repositories.get(i).getName());
+                        }
+                    }
+                    textWritten=textWritten.toLowerCase();
+                    for(int i=0;i<repositoryTitle.size(); i++)
+                    {
+                        if(repositoryTitle.get(i).toLowerCase().startsWith(textWritten))
+                        {
+                            repositoriesToShow.set(i, true);
+                        }
+                        else {
+                            repositoriesToShow.set(i, false);
+                        }
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s)
+                {
+
+                }
+            });
         }
         catch(Exception ex)
         {
             Log.e("",ex.getMessage());
         }
-//        finally
-//        {
-//            finish();
-//        }
+
     }
 
-    // to test observer/able
-    public void test_obs()
+    @Override
+    protected void onResume()
     {
-        ObservableOnSubscribe<Integer> src = new ObservableOnSubscribe<Integer>() {
-            @Override
-            public void subscribe(@NonNull ObservableEmitter<Integer> emitter) throws Exception {
-                emitter.onNext(1);
-                emitter.onNext(2);
-                emitter.onNext(3);
-                emitter.onNext(4);
-                emitter.onNext(5);
-                emitter.onComplete();
-            }
-        };
-
-        // create the observable on the data generator
-        io.reactivex.Observable<Integer> obs = io.reactivex.Observable.create(src);
-
-
-
-        Observer<Integer> observer = new Observer<Integer>() {
-            @Override
-            public void onSubscribe(Disposable d) {
-                Log.e("", "onSubscribe: ");
-            }
-
-            @Override
-            public void onNext(Integer value) {
-                Log.i("", "onNext: " + value);
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                Log.e("", "onError: ");
-            }
-
-            @Override
-            public void onComplete() {
-                Log.e("", "onComplete: All Done!");
-            }
-        };
-
-//Create our subscription//
-        obs.subscribe(observer);
-
+        adapter.notifyDataSetChanged();
+        super.onResume();
     }
+
+    @Override
+    protected void onRestart()
+    {
+        adapter.notifyDataSetChanged();
+        super.onRestart();
+    }
+
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            moveTaskToBack(true);
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void onBackPressed() {
+        moveTaskToBack(true);
+    }
+
     public void setRealmAdapter() {
 
-        RealmResults<Repository> repositories = realm.allObjects(Repository.class);
+        repositories = realm.allObjects(Repository.class);
         RealmRepositoryAdapter realmAdapter = new RealmRepositoryAdapter(this, repositories, true);
         // Set the data and tell the RecyclerView to draw
         adapter.setRealmAdapter(realmAdapter);
@@ -154,19 +172,10 @@ public class MainActivity extends AppCompatActivity
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(layoutManager);
 
-        // get data : followed this: http://camposha.info/source/android-realm-recyclerview-saveretrieveshow/
-//        List<String> reponames = new ArrayList<>();
-//        RealmResults<Repository> repos = realm.allObjects(Repository.class);
-//        for(Repository rep : repos) reponames.add(rep.getName());
-
         // create an empty adapter and add it to the recycler view
         adapter = new RepositoryAdapter(this, realm);
         recyclerView.setAdapter(adapter);
     }
-
-
-
-
 
     private void getGithubRepositories()
     {
@@ -210,8 +219,7 @@ public class MainActivity extends AppCompatActivity
                             }
                         }
                 );
-//        observable.s
-//        List<GithubRepositoriesResponse> repos_ = observable.toList().blockingGet();
+
         Log.i("Realm", String.format("Persisting %d repositories", repositories.size()));
 
         for( Repository repo : repositories)
