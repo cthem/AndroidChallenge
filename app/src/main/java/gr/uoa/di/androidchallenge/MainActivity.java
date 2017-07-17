@@ -157,6 +157,8 @@ public class MainActivity extends AppCompatActivity
 
         repositories = realm.allObjects(Repository.class);
         RealmRepositoryAdapter realmAdapter = new RealmRepositoryAdapter(this, repositories, true);
+
+
         // Set the data and tell the RecyclerView to draw
         adapter.setRealmAdapter(realmAdapter);
         adapter.notifyDataSetChanged();

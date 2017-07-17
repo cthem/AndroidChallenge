@@ -73,11 +73,15 @@ public class RealmController
     }
 
     //check if Book.class is empty
-    public boolean hasBooks() {
+    public boolean hasBooks() {//TODO
 
         return !realm.allObjects(Repository.class).isEmpty();
     }
 
+    public Repository selectByTitle(String repoName)
+    {
+        return realm.where(Repository.class).equalTo("name", repoName).findFirst();
+    }
     //query example
     public RealmResults<Repository> queryedBooks() {
 

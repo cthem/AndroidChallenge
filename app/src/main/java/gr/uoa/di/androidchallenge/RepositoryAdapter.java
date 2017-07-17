@@ -5,6 +5,7 @@ import android.content.Context;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +14,9 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import DataModel.RealmRecyclerViewAdapter;
 import POJO.Repository;
@@ -28,13 +32,25 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
     final Activity context;
     private Realm realm;
     private LayoutInflater inflater;
-    private Repository selectedRepository;
+    private Repository currentRepository;
+
+    public void setSearchList(List<Repository> searchList) {
+        this.searchList = searchList;
+    }
+
+    public void setSearchIsActive(boolean searchIsActive) {
+        SearchIsActive = searchIsActive;
+    }
+
+    private List<Repository> searchList;
+    boolean SearchIsActive;
 
 
     public RepositoryAdapter(Activity context, Realm realm)
     {
         this.context = context;
         this.realm = realm;
+        searchList = new ArrayList<>();
     }
 
     // create new views (invoked by the layout manager)
@@ -51,18 +67,20 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
     public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, final int position) {
 
         // get the repository
-        selectedRepository= getItem(position);
+        currentRepository = getItem(position);
+
+
         // cast the generic view holder to our specific one
         final CardViewHolder holder = (CardViewHolder) viewHolder;
 
         //set the title and the snippet
-        holder.textTitle.setText(selectedRepository.getName());
-        holder.textAuthor.setText(selectedRepository.getOwner().getLogin());
-        holder.textDescription.setText(selectedRepository.getDescription());
+        holder.textTitle.setText(currentRepository.getName());
+        holder.textAuthor.setText(currentRepository.getOwner().getLogin());
+        holder.textDescription.setText(currentRepository.getDescription());
 
         // load the background image
       Glide.with(context)
-                .load(selectedRepository.getOwner().getAvatarUrl().replace("https", "http"))
+                .load(currentRepository.getOwner().getAvatarUrl().replace("https", "http"))
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .fitCenter()
                 .error(R.id.ivProfilePic)
@@ -75,42 +93,48 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
             @Override
             public void onClick(View v) {
 
-                inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                View content = inflater.inflate(R.layout.selected_repository, null);
+                try
+                {
+                    inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                    View content = inflater.inflate(R.layout.selected_repository, null);
+                    String repoTitle = holder.textTitle.getText().toString();
+                    Repository repo = realm.where(Repository.class).equalTo("name", repoTitle).findFirst();
+                    final TextView tvName = (TextView)content.findViewById(R.id.tvName);
+                    final TextView tvUrl = (TextView)content.findViewById(R.id.tvUrl);
+                    final TextView tvDescription = (TextView)content.findViewById(R.id.tvDescription);
+                    final TextView tvForks = (TextView)content.findViewById(R.id.tvForks);
+                    final TextView tvOpenIssues = (TextView)content.findViewById(R.id.tvOpenIssues);
 
-                final TextView tvName = (TextView)content.findViewById(R.id.tvName);
-                final TextView tvUrl = (TextView)content.findViewById(R.id.tvUrl);
-                final TextView tvDescription = (TextView)content.findViewById(R.id.tvDescription);
-                final TextView tvForks = (TextView)content.findViewById(R.id.tvForks);
-                final TextView tvOpenIssues = (TextView)content.findViewById(R.id.tvOpenIssues);
+                    final ImageView ivProfilePic = (ImageView)content.findViewById(R.id.ivProfilePic);
+                    final TextView tvOwnerName = (TextView) content.findViewById(R.id.tvOwnerName);
+                    final TextView tvProfileUrl = (TextView)content.findViewById(R.id.tvProfileUrl);
+                    final TextView tvUserType = (TextView)content.findViewById(R.id.tvUserType);
 
-                final ImageView ivProfilePic = (ImageView)content.findViewById(R.id.ivProfilePic);
-                final TextView tvOwnerName = (TextView) content.findViewById(R.id.tvOwnerName);
-                final TextView tvProfileUrl = (TextView)content.findViewById(R.id.tvProfileUrl);
-                final TextView tvUserType = (TextView)content.findViewById(R.id.tvUserType);
+                    tvName.setText(String.format("Repository Name: %s",  repo.getName()));
+                    tvUrl.setText("URL: "+ repo.getUrl());
+                    tvDescription.setText("Short Description: "+ repo.getDescription());
+                    tvForks.setText("Number of forks: "+Integer.toString(repo.getForks()));
+                    tvOpenIssues.setText("Number of open issues: "+ Integer.toString(repo.getOpenIssues()));
 
-                tvName.setText(selectedRepository.getName());
-                tvUrl.setText(selectedRepository.getUrl());
-                tvDescription.setText(selectedRepository.getDescription());
-                tvForks.setText(selectedRepository.getForks());
-                tvOpenIssues.setText(selectedRepository.getOpenIssues());
+                    tvOwnerName.setText("Owner's name: "+ repo.getOwner().getLogin());
+                    tvProfileUrl.setText("Link to owner's profile: "+ repo.getOwner().getUrl());
+                    tvUserType.setText("User Type: "+ repo.getOwner().getType());
 
-                tvOwnerName.setText(selectedRepository.getOwner().getLogin());
-                tvProfileUrl.setText(selectedRepository.getOwner().getUrl());
-                tvUserType.setText(selectedRepository.getOwner().getType());
+                    Glide.with(context)
+                            .load(repo.getOwner().getAvatarUrl().replace("https", "http"))
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .fitCenter()
+                            .error(R.id.ivProfilePic)
+                            .into(ivProfilePic);
 
-                Glide.with(context)
-                        .load(selectedRepository.getOwner().getAvatarUrl().replace("https", "http"))
-                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-                        .centerCrop()
-                        .error(R.id.ivProfilePic)
-                        .into(ivProfilePic);
-
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setView(content)
-                        .setTitle("Details");
-                AlertDialog dialog = builder.create();
-                dialog.show();
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setView(content)
+                            .setTitle("Details");
+                    AlertDialog dialog = builder.create();
+                    dialog.show();
+                } catch (Exception e) {
+                    Log.e("RepoAdapter",e.getMessage());
+                }
             }
         });
     }
