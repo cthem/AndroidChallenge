@@ -2,6 +2,7 @@ package gr.uoa.di.androidchallenge;
 
 
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -39,12 +40,12 @@ import static gr.uoa.di.androidchallenge.R.id.recycler;
 
 public class MainActivity extends AppCompatActivity
 {
+    public static final String RECV_STATE = "RECVIEW_LIST";
     private RepositoryAdapter adapter;
     private Realm realm;
     private RecyclerView recyclerView;
     private EditText search;
     private RealmResults<Repository> repositories;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -55,7 +56,6 @@ public class MainActivity extends AppCompatActivity
         try
         {
             recyclerView = (RecyclerView)findViewById(recycler);
-
            //get realm instance
             RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(this).build();
             Realm.setDefaultConfiguration(realmConfiguration);
@@ -176,12 +176,32 @@ public class MainActivity extends AppCompatActivity
         // use a linear layout manager since the cards are vertically scrollable
         final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
         recyclerView.setLayoutManager(layoutManager);
 
         // create an empty adapter and add it to the recycler view
         adapter = new RepositoryAdapter(this, realm);
         recyclerView.setAdapter(adapter);
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle state) {
+        super.onSaveInstanceState(state);
+        Parcelable recState = recyclerView.getLayoutManager().onSaveInstanceState();
+        state.putParcelable(RECV_STATE, recState );
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle state) {
+        super.onRestoreInstanceState(state);
+        if(state != null)
+        {
+            Parcelable recState = state.getParcelable(RECV_STATE);
+            recyclerView.getLayoutManager().onRestoreInstanceState(recState);
+        }
+
+    }
+
 
     private void getGithubRepositories()
     {

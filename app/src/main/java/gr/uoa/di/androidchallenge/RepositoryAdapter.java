@@ -87,13 +87,12 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
                 .error(R.id.ivProfilePic)
                 .into(holder.avatar);
 
-
         //show more details about selected repository
         holder.card.setOnClickListener(new View.OnClickListener()
         {
             @Override
-            public void onClick(View v) {
-
+            public void onClick(View v)
+            {
                 try
                 {
                     inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
