@@ -11,7 +11,6 @@ import retrofit2.http.Query;
 
 public interface RestAPI
 {
-    //&q=created:
     @GET("search/repositories")
     Observable<GithubRepositoriesResponse> getRepositories (@Query("sort") String stars, @Query("order") String desc, @Query("q") String yesterday);
 }

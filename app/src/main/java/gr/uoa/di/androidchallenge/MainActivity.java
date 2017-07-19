@@ -50,9 +50,10 @@ public class MainActivity extends AppCompatActivity
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        try {
-            setContentView(R.layout.activity_main);
+        try
+        {
             recyclerView = (RecyclerView)findViewById(recycler);
 
            //get realm instance
@@ -70,6 +71,7 @@ public class MainActivity extends AppCompatActivity
             //get repositories
             getGithubRepositories();
 
+            //set RecyclerView and Realm
             setupRecycler();
             setRealmAdapter();
 
@@ -187,7 +189,8 @@ public class MainActivity extends AppCompatActivity
                 .blockingSubscribe(
                         new Observer<GithubRepositoriesResponse>() {
                             @Override
-                            public void onSubscribe(@NonNull Disposable d) {
+                            public void onSubscribe(@NonNull Disposable d)
+                            {
                                 Log.i("Realm", String.format("Repositories observer subscribed."));
                             }
 
@@ -246,7 +249,8 @@ public class MainActivity extends AppCompatActivity
         return cal.getTime();
     }
 
-    private String getYesterdayDateString() {
+    private String getYesterdayDateString()
+    {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         String yestdate = dateFormat.format(yesterday());
