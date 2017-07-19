@@ -35,7 +35,8 @@ public class RepositoryAdapter extends RealmRecyclerViewAdapter<Repository>
     private LayoutInflater inflater;
     private Repository currentRepository;
 
-    public void setSearchList(List<Repository> searchList) {
+    public void setSearchList(List<Repository> searchList)
+    {
         this.searchList = searchList;
     }
 

@@ -119,7 +119,12 @@ public class MainActivity extends AppCompatActivity
         {
             Log.e("",ex.getMessage());
         }
+    }
 
+    @Override
+    protected void onPause()
+    {
+        super.onPause();
     }
 
     @Override
@@ -136,7 +141,8 @@ public class MainActivity extends AppCompatActivity
         super.onRestart();
     }
 
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
+    public boolean onKeyDown(int keyCode, KeyEvent event)
+    {
         if (keyCode == KeyEvent.KEYCODE_BACK) {
             moveTaskToBack(true);
             return true;
@@ -145,7 +151,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed()
+    {
         moveTaskToBack(true);
     }
 
